@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>BType cloth demo</title>
+  <link rel="stylesheet" href="app.css">
+</head>
+<body>
+  <div class="sizer">
+    <input name="size" type="range" min="100" max="350" value="100">
+    <div class="output">32 x 33</div>
+  </div>
+
+  <a class="info">?</a>
+
+  <div class="info closed">
+    <p>
+      Drag the cloth around with the left mouse button, and tear it with the right button.
+    </p>
+    <p>
+      This was written with <a href="https://github.com/mattbasta/btype">BType</a>, a fast language for the web.
+    </p>
+  </div>
+
+  <script src="stats.min.js"></script>
+  <script src="gl-matrix.js"></script>
+  <script src="gl-renderer.js"></script>
+  <script src="verlet-run.js"></script>
+  <script src="verlet.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,335 @@
+import date;
+import math;
+
+
+object Vec2d {
+    float:x;
+    float:y;
+
+    new(float:x, float:y) {
+        self.x = x;
+        self.y = y;
+    }
+}
+
+object Point {
+    Vec2d:pos;
+    Vec2d:lastPos;
+    Vec2d:size;
+    float:mass;
+    Vec2d:acc;
+    int:pinned;
+    int:debug;
+    bool:free;
+    float:markRemove;
+
+
+    new(float:x, float:y, float:mass, int:pinned) {
+        self.pos = new Vec2d(x, y);
+        self.size = new Vec2d(0, 0);
+        self.acc = new Vec2d(0, 0);
+
+        self.lastPos = self.pos;
+        self.mass = mass;
+        self.pinned = pinned;
+    }
+}
+
+object Link {
+    Point:p1;
+    Point:p2;
+    float:distRest;
+    float:stiffness;
+    float:tearness;
+
+    new(Point:p1, Point:p2, float:distRest, float:stiffness, float:tearness) {
+        self.p1 = p1;
+        self.p2 = p2;
+        self.distRest = distRest;
+        self.stiffness = stiffness;
+        self.tearness = tearness;
+    }
+}
+
+int:clothW = 0;
+int:clothH = 0;
+int:numPoints = 0;
+array<Point>:points = new array<Point>(500000);
+
+int:numLinks = 0;
+array<Link>:links = new array<Link>(500000);
+
+Vec2d:mouse = new Vec2d(0, 0);
+Vec2d:prevMouse = new Vec2d(0, 0);
+
+int:mouseButton = 0;
+int:canvasWidth = 0;
+int:mouseCut = 6;
+int:mouseInfluenceSize = 30;
+int:tearSensitivity = 65;
+int:gravity = 0;
+bool:windEnabled = false;
+int:leftOverTime = 0;
+int:startTime = 0;
+
+
+func float:distPointToLine(float:x, float:y, Vec2d:p1, Vec2d:p2) {
+    var Ax = p1.x - x;
+    var Ay = p1.y - y;
+    var Bx = p2.x - p1.x;
+    var By = p2.y - p1.y;
+
+    var lenA = Ax * Ax + Ay * Ay;
+    var lenB = Bx * Bx + By * By;
+
+    if (lenA > lenB) reutrn 1000.0;
+
+    var det = (-1 * Ax * Bx) + (-1 * Ay * Ay);
+
+    if (det > lenB or det < 0.0) {
+        var Cx = p2.x - x;
+        var Cy = p2.y - y;
+        return math.min(lenA, Cx * Cx + Cy * Cy);
+    }
+
+    det = Bx * Ay - By * Ax;
+    return det * det / lenB;
+}
+
+
+func update() {
+    var dt = 16.0 / 1000.0;
+    var totalTime = date.unix() - startTime;
+
+    var z = 0;
+    var i = 0;
+    for (z = 0; z < 5; z = z + 1;) {
+        for (i = 0; i < numLinks; i = i + 1;) {
+            if (links[i].p1.markRemove) continue;
+            if (links[i].p2.markRemove) continue;
+
+            solveLink(links[i]);
+        }
+    }
+
+    for (i = 0; i < numPoints; i++) {
+        if (windEnabled) {
+            applyForce(
+                points[i],
+                ((math.cos(points[i].pos.x / 30.0) + 1.0) * 200.0 + points[i].pos.y / 700.0 * 600.0) * (math.sin(totalTime as float) * 0.5 + 1),
+                0
+            );
+        }
+        updatePoint(points[i], dt);
+    }
+}
+export update;
+
+func array<float>:renderLines() {
+    array<float>:verts = new array<float>(2000000);
+    int:idx = 1;
+
+    var i = 0;
+    for (i = 0; i < numLinks; i = i + 1;) {
+        if (links[i].p1.markRemove) continue;
+        if (links[i].p2.markRemove) continue;
+
+        verts[idx] = links[i].p1.pos.x;
+        idx = idx + 1;
+        verts[idx] = links[i].p1.pos.y;
+        idx = idx + 1;
+        verts[idx] = links[i].p2.pos.x;
+        idx = idx + 1;
+        verts[idx] = links[i].p2.pos.y;
+        idx = idx + 1;
+    }
+
+    verts[0] = (idx as float) - 1.0;
+    return verts;
+}
+export renderLines;
+
+
+# Point implementation
+
+func updatePoint(Point:p, float:dt) {
+    float:dtSeq = dt * dt;
+
+    if (mouseButton) {
+        Vec2d:diff = new Vec2d(p.pos.x - mouse.x, p.pos.y - mouse.y);
+        float:dist = math.hypot(diff.x, diff.y);
+
+        if (mouseButton == 1 and dist < (mouseInfluenceSize as float)) {
+            p.lastPos.x = p.pos.x - math.bound((mouse.x - prevMouse.x) * 1.8, -30.0, 30.0);
+            p.lastPos.y = p.pos.y - math.bound((mouse.y - prevMouse.y) * 1.8, -30.0, 30.0);
+        } else if (dist < (mouseCut as float)) {
+            p.markRemove = true;
+        }
+    }
+
+    if(!p.free) {
+        applyForce(p, 0, p.mass * gravity);
+    }
+
+    float:x = p.pos.x;
+    float:y = p.pos.y;
+    float:lx = p.lastPos.x;
+    float:ly = p.lastPos.y;
+
+    if(!p.pinned) {
+        p.lastPos = p.pos;
+
+        Vec2d:vel = new Vec2D((x - lx) * 0.9, (y - ly) * 0.9);
+        p.pos.x = x + vel.x + p.acc.x * dtSeq;
+        p.pos.y = y + vel.y + p.acc.y * dtSeq;
+    }
+
+    p.acc.x = 0;
+    p.acc.y = 0;
+}
+
+func applyForce(Point:p, float:x, float:y) {
+    p.acc.x = p.acc.x + x / p.mass;
+    p.acc.y = p.acc.y + y / p.mass;
+}
+
+# Link implementation
+
+func solveLink(Link:link) {
+    Point:p1 = link.p1;
+    Point:p2 = link.p2;
+
+    Vec2d:diff = new Vec2d(p1.pos.x - p2.pos.x, p1.pos.y - p2.pos.y);
+    float:d = math.sqrt(diff.x * diff.x + diff.y * diff.y);
+
+    if (d > link.tearness) {
+        removeLink(link);
+    }
+
+    float:scalar = (link.distRest - d) / d;
+
+    if(!p1.pinned) {
+        p1.pos.x = p1.pos.x + diff.x * scalar * 0.5;
+        p1.pos.y = p1.pos.y + diff.y * scalar * 0.5;
+    }
+
+    if(!p2.pinned) {
+        p2.pos.x = p2.pos.x - diff.x * scalar * 0.5;
+        p2.pos.y = p2.pos.y - diff.y * scalar * 0.5;
+    }
+}
+
+func removeLink(Link:link) {
+    link.p1.markRemove = true;
+    link.p2.markRemove = true;
+}
+
+# Init
+
+func constructMesh(int:level) {
+    clothW = level + 8;
+    clothH = level / 2;
+
+    int:linkPtr = 0;
+    int:pointPtr = 0;
+
+    float:restingDistance = 700.0 / ((clothW - 1) as float);
+
+    int:startX = canvasWidth / 2 - int((clothW * restingDistance) / 2);
+    int:startY = 0;
+
+    int:x = 0;
+    int:y = 0;
+    int:index = 0;
+    Point:p = null;
+    float:tearness = 0.0;
+    for(y = 0; y < clothH; y = y + 1;) {
+        for(x = 0; x < clothW; x = x + 1;) {
+            p = new Point(
+                (startX as float) + (x as float) * restingDistance,
+                (startY as float) + (y as float) * restingDistance,
+                1,
+                y == 0
+            );
+            index = y * clothW + x;
+            points[index] = p;
+
+            tearness = tearSensitivity as float;
+
+            if (clothH > 70) {
+                if (y % 2) {
+                    if (x % 2) {
+                        points[index].free = true;
+                    }
+                }
+
+                if (y < 10) {
+                    tearness = 80.0;
+                }
+            }
+
+            if (x > 0) {
+                links[linkPtr] = new Link(points[index - 1], points[index], restingDistance, 1, tearness);
+                linkPtr = linkPtr + 1;
+            }
+
+            if (y > 0) {
+                links[linkPtr] = new Link(points[(y - 1) * clothW + x], points[index], restingDistance, 1, tearness);
+                linkPtr = linkPtr + 1;
+            }
+        }
+    }
+
+    numLinks = linkPtr;
+    numPoints = clothW * clothH;
+}
+export constructMesh;
+
+func int:getClothW() {
+    return clothW;
+}
+export getClothW;
+
+func int:getClothH() {
+    return clothH;
+}
+export getClothH;
+
+func setGravity(int:value) {
+    gravity = value;
+}
+export setGravity;
+
+func setWind(bool:flag) {
+    windEnabled = flag;
+}
+export setWind;
+
+func setMouse(int:x, int:y) {
+    mouse.x = x;
+    mouse.y = y;
+}
+export setMouse;
+
+func setMouseButton(int:button) {
+    mouseButton = button;
+}
+export setMouseButton;
+
+func int:getMouseButton() {
+    return mouseButton;
+}
+export getMouseButton;
+
+func mouseMove(float:x, float:y, int:button) {
+    prevMouse = mouse;
+    mouse.x = x;
+    mouse.y = y;
+}
+export mouseMove;
+
+func main(int:width) {
+    canvasWidth = width;
+    startTime = date.unix();
+}
+export main;
