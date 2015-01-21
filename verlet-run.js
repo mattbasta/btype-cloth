@@ -1,12 +1,12 @@
 
 var canvas, ctx;
 var requestAnimFrame = (function(){
-  return (window.requestAnimationFrame ||
-          window.webkitRequestAnimationFrame ||
-          window.mozRequestAnimationFrame ||
-          function(callback) {
-            window.setTimeout(callback, 1000 / 60);
-          });
+    return (window.requestAnimationFrame ||
+            window.webkitRequestAnimationFrame ||
+            window.mozRequestAnimationFrame ||
+            function(callback) {
+                setTimeout(callback, 1000 / 60);
+            });
 })();
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -17,8 +17,9 @@ document.addEventListener('DOMContentLoaded', function() {
     document.body.appendChild(canvas);
 
     var renderer = new GLRenderer(canvas);
-    if(renderer.unsupported) {
+    if (renderer.unsupported) {
         alert('WebGL is required and not supported on your system.');
+        return;
     }
 
     var cloth = window.verlet;
@@ -174,12 +175,3 @@ document.addEventListener('DOMContentLoaded', function() {
 
     start();
 });
-
-function currentTime() {
-    if(typeof performance !== 'undefined' && performance.now) {
-        return performance.now();
-    }
-    else {
-        return Date.now();
-    }
-}
