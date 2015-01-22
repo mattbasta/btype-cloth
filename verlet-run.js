@@ -122,7 +122,7 @@ document.addEventListener('DOMContentLoaded', function() {
         requestAnimFrame(heartbeat);
 
         stats.begin();
-        var now = currentTime();
+        var now = Date.now();
         var dt = now - lastTime;
         lastTime = now;
 
@@ -132,11 +132,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // render
 
-        var ptr = cloth.renderLines();
-        var length = window.F4[ptr >> 2];
+        // var ptr = cloth.renderLines();
+        var points = cloth.renderLines();
+        // var length = window.F4[ptr >> 2];
 
-        var points = window.F4.subarray((ptr >> 2) + 1, (ptr >> 2) + length);
-        renderer.render(points,
+        // var points = window.F4.subarray((ptr >> 2) + 1, (ptr >> 2) + length);
+        renderer.render(new Float32Array(points).subarray(1),
                         cloth.getClothW(),
                         cloth.getClothH());
 
@@ -153,9 +154,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     var slider = document.querySelector('.sizer input[name=size]');
-    updateSize(slider.value);
+    updateSize(slider.value|0);
     slider.addEventListener('change', function() {
-        updateSize(slider.value);
+        updateSize(slider.value|0);
     });
 
     var els = Array.prototype.slice.call(document.querySelectorAll('.info'));
