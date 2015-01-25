@@ -121,25 +121,26 @@ func update() {
 }
 export update;
 
-func array<float>:renderLines() {
-    array<float>:verts = new array<float>(2000000);
+# This is placed out here to minimize malloc calls
+array<sfloat>:verts = new array<sfloat>(2000000);
+func array<sfloat>:renderLines() {
     int:idx = 1;
 
     var i = 0;
     for (i = 0; i < numLinks; i = i + 1;) {
         if (links[i].p1.markRemove or links[i].p2.markRemove) continue;
 
-        verts[idx] = links[i].p1.pos.x;
+        verts[idx] = links[i].p1.pos.x as sfloat;
         idx = idx + 1;
-        verts[idx] = links[i].p1.pos.y;
+        verts[idx] = links[i].p1.pos.y as sfloat;
         idx = idx + 1;
-        verts[idx] = links[i].p2.pos.x;
+        verts[idx] = links[i].p2.pos.x as sfloat;
         idx = idx + 1;
-        verts[idx] = links[i].p2.pos.y;
+        verts[idx] = links[i].p2.pos.y as sfloat;
         idx = idx + 1;
     }
 
-    verts[0] = (idx as float) - 1.0;
+    verts[0] = (idx as sfloat) - 1.0s;
     return verts;
 }
 export renderLines;

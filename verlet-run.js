@@ -114,6 +114,8 @@ document.addEventListener('DOMContentLoaded', function() {
         running = false;
     }
 
+    var clothFloatView = new Float32Array(cloth.$internal.heap);
+
     function heartbeat() {
         if(!running) {
             return;
@@ -132,12 +134,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // render
 
-        // var ptr = cloth.renderLines();
-        var points = cloth.renderLines();
-        // var length = window.F4[ptr >> 2];
+        var pointsPtr = cloth.renderLines();
+        var pointsLength = clothFloatView[pointsPtr + 16 >> 2];
 
-        // var points = window.F4.subarray((ptr >> 2) + 1, (ptr >> 2) + length);
-        renderer.render(new Float32Array(points).subarray(1),
+        var points = clothFloatView.subarray(pointsPtr + 20 >> 2, pointsPtr + 20 + pointsLength * 4 >> 2);
+        renderer.render(points,
                         cloth.getClothW(),
                         cloth.getClothH());
 
