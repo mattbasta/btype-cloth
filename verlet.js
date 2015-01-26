@@ -1,8 +1,9 @@
-window.verlet = 
+window.verlet =
 (function(module) {
 var heap = new ArrayBuffer(134217728);
 this.Math.imul = this.Math.imul || function imul(a, b) {return (a | 0) * (b | 0) | 0;};
-this.Math.fround = this.Math.fround || function fround(x) {var f32 = new Float32Array(1);return f32[0] = x, f32[0];};
+var f32_ = new Float32Array(1);
+this.Math.fround = this.Math.fround || function fround(x) {return f32[0] = x, f32[0];};
 var ret = module(this, {"Datenowunix":function() {return (new Date()).getTime() / 1000 | 0;},"Datenowunix":function() {return (new Date()).getTime() / 1000 | 0;}}, heap);
 if (ret.$init) {ret.$init();}
 return {
@@ -25,27 +26,27 @@ $init: ret.$init
     "use asm";
     var imul = stdlib.Math.imul;
     var fround = stdlib.Math.fround;
+var $yd = 0;
+var $Fd = 6;
+var $Kd = 0;
+var $Jd = 0;
+var $Id = 0.0;
+var $4e = foreign.Datenowunix;
+var $_e = stdlib.Math.cos;
+var $af = stdlib.Math.sin;
+var $gf = stdlib.Math.sqrt;
 var $vd = 0;
-var $Cd = 6;
-var $Id = 0;
-var $Gd = 0;
-var $Fd = 0.0;
-var $3e = foreign.Datenowunix;
-var $9e = stdlib.Math.cos;
-var $_e = stdlib.Math.sin;
-var $ff = stdlib.Math.sqrt;
-var $sd = 0;
-var $td = 0;
-var $ud = 0;
-var $Ed = 65;
 var $wd = 0;
 var $xd = 0;
-var $yd = 0;
+var $Hd = 65.0;
 var $zd = 0;
 var $Ad = 0;
 var $Bd = 0;
-var $Dd = 30;
-var $Pd = 0;
+var $Cd = 0;
+var $Dd = 0;
+var $Ed = 0;
+var $Gd = 30.0;
+var $Rd = 0;
 var memheap = new stdlib.Uint8Array(heap);
 var sfloatheap = new stdlib.Float32Array(heap);
 var floatheap = new stdlib.Float64Array(heap);
@@ -53,13 +54,13 @@ var ptrheap = new stdlib.Uint32Array(heap);
 function $Nb($Ob) {
     $Ob = +$Ob;
     var $Jc = 0.0;
-    $Jc = +$_e(+$Ob);
+    $Jc = +$af(+$Ob);
     return +$Jc;
 }
 function $2b($3b) {
     $3b = +$3b;
     var $Qc = 0.0;
-    $Qc = +$ff(+$3b);
+    $Qc = +$gf(+$3b);
     return +$Qc;
 }
 function $4b($5b, $6b) {
@@ -104,7 +105,7 @@ function gcref(ptr) {
 }
 function $K() {
     var $Za = 0;
-    $Za = $3e() | 0;
+    $Za = $4e() | 0;
     return $Za | 0;
 }
 function malloc(bytes) {
@@ -216,7 +217,7 @@ function free(pointer) {
 function $Lb($Mb) {
     $Mb = +$Mb;
     var $Ic = 0.0;
-    $Ic = +$9e(+$Mb);
+    $Ic = +$_e(+$Mb);
     return +$Ic;
 }
 function $Wc($0c, $1c, $2c) {
@@ -233,154 +234,158 @@ function $4c($_c, $ad, $bd, $cd, $dd) {
     $bd = +$bd;
     $cd = +$cd;
     $dd = $dd | 0;
-    ptrheap[$_c + 19 >> 2] = gcref($Wc(gcref(calloc(24) | 0) | 0, +$ad, +$bd) | 0) | 0;
-    ptrheap[$_c + 51 >> 2] = gcref($Wc(gcref(calloc(24) | 0) | 0, 0.0, 0.0) | 0) | 0;
-    ptrheap[$_c + 35 >> 2] = gcref(ptrheap[$_c + 19 >> 2] | 0) | 0;
-    floatheap[$_c + 11 >> 3] = +$cd;
-    memheap[$_c + 8 >> 0] = $dd | 0;
+    ptrheap[$_c + 16 >> 2] = gcref($Wc(gcref(calloc(24) | 0) | 0, +$ad, +$bd) | 0) | 0;
+    ptrheap[$_c + 24 >> 2] = gcref($Wc(gcref(calloc(24) | 0) | 0, 0.0, 0.0) | 0) | 0;
+    ptrheap[$_c + 20 >> 2] = gcref(ptrheap[$_c + 16 >> 2] | 0) | 0;
+    floatheap[$_c + 8 >> 3] = +$cd;
+    memheap[$_c + 28 >> 0] = $dd | 0;
     return $_c | 0;
 }
-function $fd($md, $nd, $od, $pd, $qd, $rd) {
-    $md = $md | 0;
-    $nd = $nd | 0;
-    $od = $od | 0;
-    $pd = +$pd;
-    $qd = +$qd;
-    $rd = +$rd;
-    ptrheap[$md + 32 >> 2] = gcref($nd | 0) | 0;
-    ptrheap[$md + 91 >> 2] = gcref($od | 0) | 0;
-    floatheap[$md + 8 >> 3] = +$pd;
-    floatheap[$md + 16 >> 3] = +$qd;
-    floatheap[$md + 24 >> 3] = +$rd;
-    return $md | 0;
+function $hd($pd, $qd, $rd, $sd, $td, $ud) {
+    $pd = $pd | 0;
+    $qd = $qd | 0;
+    $rd = $rd | 0;
+    $sd = +$sd;
+    $td = +$td;
+    $ud = +$ud;
+    ptrheap[$pd + 32 >> 2] = gcref($qd | 0) | 0;
+    ptrheap[$pd + 36 >> 2] = gcref($rd | 0) | 0;
+    floatheap[$pd + 8 >> 3] = +$sd;
+    floatheap[$pd + 16 >> 3] = +$td;
+    floatheap[$pd + 24 >> 3] = +$ud;
+    return $pd | 0;
 }
-function $Od() {
+function $fd($od) {
+    $od = $od | 0;
+    memheap[(ptrheap[$od + 32 >> 2] | 0) + 30 >> 0] = 1;
+    memheap[(ptrheap[$od + 36 >> 2] | 0) + 30 >> 0] = 1;
+}
+function $Qd() {
     var $Ze = 0;
     var $ue = 0.016;
     var $ve = 0;
     var $we = 0;
-    var $xe = 0;
-    $ve = ($K() | 0) - ($Id | 0) | 0;
-    for ($we = 0; ($we | 0) < 5 | 0; $we = ($we | 0) + 1 | 0) {
-        for ($xe = 0; ($xe | 0) < ($wd | 0) | 0; $xe = ($xe | 0) + 1 | 0) {
-            $Ze = memheap[(ptrheap[(ptrheap[$xd + ($xe * 142 | 0) + 16 >> 2] | 0) + 32 >> 2] | 0) + 10 >> 0] | 0;
+    for ($ve = 0; ($ve | 0) < 5 | 0; $ve = ($ve | 0) + 1 | 0) {
+        for ($we = 0; ($we | 0) < ($zd | 0) | 0; $we = ($we | 0) + 1 | 0) {
+            $Ze = memheap[(ptrheap[(ptrheap[$Ad + ($we * 4 | 0) + 16 >> 2] | 0) + 32 >> 2] | 0) + 30 >> 0] | 0;
             if (!($Ze | 0)) {
-                $Ze = memheap[(ptrheap[(ptrheap[$xd + ($xe * 142 | 0) + 16 >> 2] | 0) + 91 >> 2] | 0) + 10 >> 0] | 0;
+                $Ze = memheap[(ptrheap[(ptrheap[$Ad + ($we * 4 | 0) + 16 >> 2] | 0) + 36 >> 2] | 0) + 30 >> 0] | 0;
             }
             if ($Ze) {
                 continue;
             }
-            $Yd(ptrheap[$xd + ($xe * 142 | 0) + 16 >> 2] | 0);
+            $0d(ptrheap[$Ad + ($we * 4 | 0) + 16 >> 2] | 0);
         }
     }
-    for ($xe = 0; ($xe | 0) < ($ud | 0) | 0; $xe = ($xe | 0) + 1 | 0) {
-        if ($Gd) {
-            $Ud(ptrheap[$vd + ($xe * 59 | 0) + 16 >> 2] | 0, +(+(+(+(+$Lb(+(+floatheap[(ptrheap[(ptrheap[$vd + ($xe * 59 | 0) + 16 >> 2] | 0) + 19 >> 2] | 0) + 8 >> 3] / 30.0)) + 1.0) * 200.0) + +(+(+floatheap[(ptrheap[(ptrheap[$vd + ($xe * 59 | 0) + 16 >> 2] | 0) + 19 >> 2] | 0) + 16 >> 3] / 700.0) * 600.0)) * +(+(+$Nb(+($ve | 0)) * 0.5) + 1.0)), 0.0);
+    for ($we = 0; ($we | 0) < ($xd | 0) | 0; $we = ($we | 0) + 1 | 0) {
+        $Td(ptrheap[$yd + ($we * 4 | 0) + 16 >> 2] | 0, +$ue);
+    }
+    if ($Jd) {
+        var $xe = 0;
+        $xe = ($K() | 0) - ($Kd | 0) | 0;
+        for ($we = 0; ($we | 0) < ($xd | 0) | 0; $we = ($we | 0) + 1 | 0) {
+            $Wd(ptrheap[$yd + ($we * 4 | 0) + 16 >> 2] | 0, +(+(+(+(+$Lb(+(+floatheap[(ptrheap[(ptrheap[$yd + ($we * 4 | 0) + 16 >> 2] | 0) + 16 >> 2] | 0) + 8 >> 3] / 30.0)) + 1.0) * 200.0) + +(+(+floatheap[(ptrheap[(ptrheap[$yd + ($we * 4 | 0) + 16 >> 2] | 0) + 16 >> 2] | 0) + 16 >> 3] / 700.0) * 600.0)) * +(+(+$Nb(+($xe | 0)) * 0.5) + 1.0)), 0.0);
         }
-        $Rd(ptrheap[$vd + ($xe * 59 | 0) + 16 >> 2] | 0, +$ue);
     }
 }
-function $Qd() {
+function $Sd() {
     var $0e = 0;
     var $ye = 1;
     var $ze = 0;
-    for ($ze = 0; ($ze | 0) < ($wd | 0) | 0; $ze = ($ze | 0) + 1 | 0) {
-        $0e = memheap[(ptrheap[(ptrheap[$xd + ($ze * 142 | 0) + 16 >> 2] | 0) + 32 >> 2] | 0) + 10 >> 0] | 0;
+    for ($ze = 0; ($ze | 0) < ($zd | 0) | 0; $ze = ($ze | 0) + 1 | 0) {
+        $0e = memheap[(ptrheap[(ptrheap[$Ad + ($ze * 4 | 0) + 16 >> 2] | 0) + 32 >> 2] | 0) + 30 >> 0] | 0;
         if (!($0e | 0)) {
-            $0e = memheap[(ptrheap[(ptrheap[$xd + ($ze * 142 | 0) + 16 >> 2] | 0) + 91 >> 2] | 0) + 10 >> 0] | 0;
+            $0e = memheap[(ptrheap[(ptrheap[$Ad + ($ze * 4 | 0) + 16 >> 2] | 0) + 36 >> 2] | 0) + 30 >> 0] | 0;
         }
         if ($0e) {
             continue;
         }
-        sfloatheap[$Pd + ($ye * 4 | 0) + 16 >> 2] = fround(+floatheap[(ptrheap[(ptrheap[(ptrheap[$xd + ($ze * 142 | 0) + 16 >> 2] | 0) + 32 >> 2] | 0) + 19 >> 2] | 0) + 8 >> 3]);
+        sfloatheap[$Rd + ($ye * 4 | 0) + 16 >> 2] = fround(+floatheap[(ptrheap[(ptrheap[(ptrheap[$Ad + ($ze * 4 | 0) + 16 >> 2] | 0) + 32 >> 2] | 0) + 16 >> 2] | 0) + 8 >> 3]);
         $ye = ($ye | 0) + 1 | 0;
-        sfloatheap[$Pd + ($ye * 4 | 0) + 16 >> 2] = fround(+floatheap[(ptrheap[(ptrheap[(ptrheap[$xd + ($ze * 142 | 0) + 16 >> 2] | 0) + 32 >> 2] | 0) + 19 >> 2] | 0) + 16 >> 3]);
+        sfloatheap[$Rd + ($ye * 4 | 0) + 16 >> 2] = fround(+floatheap[(ptrheap[(ptrheap[(ptrheap[$Ad + ($ze * 4 | 0) + 16 >> 2] | 0) + 32 >> 2] | 0) + 16 >> 2] | 0) + 16 >> 3]);
         $ye = ($ye | 0) + 1 | 0;
-        sfloatheap[$Pd + ($ye * 4 | 0) + 16 >> 2] = fround(+floatheap[(ptrheap[(ptrheap[(ptrheap[$xd + ($ze * 142 | 0) + 16 >> 2] | 0) + 91 >> 2] | 0) + 19 >> 2] | 0) + 8 >> 3]);
+        sfloatheap[$Rd + ($ye * 4 | 0) + 16 >> 2] = fround(+floatheap[(ptrheap[(ptrheap[(ptrheap[$Ad + ($ze * 4 | 0) + 16 >> 2] | 0) + 36 >> 2] | 0) + 16 >> 2] | 0) + 8 >> 3]);
         $ye = ($ye | 0) + 1 | 0;
-        sfloatheap[$Pd + ($ye * 4 | 0) + 16 >> 2] = fround(+floatheap[(ptrheap[(ptrheap[(ptrheap[$xd + ($ze * 142 | 0) + 16 >> 2] | 0) + 91 >> 2] | 0) + 19 >> 2] | 0) + 16 >> 3]);
+        sfloatheap[$Rd + ($ye * 4 | 0) + 16 >> 2] = fround(+floatheap[(ptrheap[(ptrheap[(ptrheap[$Ad + ($ze * 4 | 0) + 16 >> 2] | 0) + 36 >> 2] | 0) + 16 >> 2] | 0) + 16 >> 3]);
         $ye = ($ye | 0) + 1 | 0;
     }
-    sfloatheap[$Pd + (0 * 4 | 0) + 16 >> 2] = fround(fround($ye | 0) - fround(1.0));
-    return $Pd | 0;
+    sfloatheap[$Rd + (0 * 4 | 0) + 16 >> 2] = fround(fround($ye | 0) - fround(1.0));
+    return $Rd | 0;
 }
-function $Rd($Sd, $Td) {
-    $Sd = $Sd | 0;
-    $Td = +$Td;
-    var $Be = 0.0;
-    var $Ae = 0.0;
-    var $Ce = 0.0;
+function $Td($Ud, $Vd) {
+    $Ud = $Ud | 0;
+    $Vd = +$Vd;
     var $De = 0.0;
+    var $Ae = 0.0;
+    var $Be = 0.0;
+    var $Ce = 0.0;
     var $Ee = 0.0;
     var $Fe = 0.0;
-    $Ae = +(+$Td * +$Td);
-    if (($Ad | 0) != 0 | 0) {
-        $Be = +$4b(+(+floatheap[(ptrheap[$Sd + 19 >> 2] | 0) + 8 >> 3] - +floatheap[$yd + 8 >> 3]), +(+floatheap[(ptrheap[$Sd + 19 >> 2] | 0) + 16 >> 3] - +floatheap[$yd + 16 >> 3]));
-        if (($Ad | 0) == 1 | 0) {
-            if (+$Be < +($Dd | 0) | 0) {
-                floatheap[(ptrheap[$Sd + 35 >> 2] | 0) + 8 >> 3] = +(+floatheap[(ptrheap[$Sd + 19 >> 2] | 0) + 8 >> 3] - +$qc(+(+(+floatheap[$yd + 8 >> 3] - +floatheap[$zd + 8 >> 3]) * 1.8), +-30.0, 30.0));
-                floatheap[(ptrheap[$Sd + 35 >> 2] | 0) + 16 >> 3] = +(+floatheap[(ptrheap[$Sd + 19 >> 2] | 0) + 16 >> 3] - +$qc(+(+(+floatheap[$yd + 16 >> 3] - +floatheap[$zd + 16 >> 3]) * 1.8), +-30.0, 30.0));
+    if (memheap[$Ud + 28 >> 0] | 0) {
+        return;
+    }
+    $Ae = +(+$Vd * +$Vd);
+    $Be = +floatheap[(ptrheap[$Ud + 16 >> 2] | 0) + 8 >> 3];
+    $Ce = +floatheap[(ptrheap[$Ud + 16 >> 2] | 0) + 16 >> 3];
+    if (($Dd | 0) != 0 | 0) {
+        $De = +$4b(+(+$Be - +floatheap[$Bd + 8 >> 3]), +(+$Ce - +floatheap[$Bd + 16 >> 3]));
+        if (($Dd | 0) == 1 | 0) {
+            if (+$De < +$Gd | 0) {
+                floatheap[(ptrheap[$Ud + 20 >> 2] | 0) + 8 >> 3] = +(+$Be - +$qc(+(+(+floatheap[$Bd + 8 >> 3] - +floatheap[$Cd + 8 >> 3]) * 1.8), -30.0, 30.0));
+                floatheap[(ptrheap[$Ud + 20 >> 2] | 0) + 16 >> 3] = +(+$Ce - +$qc(+(+(+floatheap[$Bd + 16 >> 3] - +floatheap[$Cd + 16 >> 3]) * 1.8), -30.0, 30.0));
             }
         } else {
-            if (+$Be < +($Cd | 0) | 0) {
-                memheap[$Sd + 10 >> 0] = 1;
+            if (+$De < +($Fd | 0) | 0) {
+                memheap[$Ud + 30 >> 0] = 1;
             }
         }
     }
-    if (!(memheap[$Sd + 9 >> 0] | 0)) {
-        $Ud($Sd | 0, 0.0, +(+floatheap[$Sd + 11 >> 3] * +$Fd));
+    if (!(memheap[$Ud + 29 >> 0] | 0)) {
+        $Wd($Ud | 0, 0.0, +(+floatheap[$Ud + 8 >> 3] * +$Id));
     }
-    $Ce = +floatheap[(ptrheap[$Sd + 19 >> 2] | 0) + 8 >> 3];
-    $De = +floatheap[(ptrheap[$Sd + 19 >> 2] | 0) + 16 >> 3];
-    $Ee = +floatheap[(ptrheap[$Sd + 35 >> 2] | 0) + 8 >> 3];
-    $Fe = +floatheap[(ptrheap[$Sd + 35 >> 2] | 0) + 16 >> 3];
-    if (!(memheap[$Sd + 8 >> 0] | 0)) {
-        ptrheap[$Sd + 35 >> 2] = gcref(ptrheap[$Sd + 19 >> 2] | 0) | 0;
-        floatheap[(ptrheap[$Sd + 19 >> 2] | 0) + 8 >> 3] = +(+(+$Ce + +(+(+$Ce - +$Ee) * 0.9)) + +(+floatheap[(ptrheap[$Sd + 51 >> 2] | 0) + 8 >> 3] * +$Ae));
-        floatheap[(ptrheap[$Sd + 19 >> 2] | 0) + 16 >> 3] = +(+(+$De + +(+(+$De - +$Fe) * 0.9)) + +(+floatheap[(ptrheap[$Sd + 51 >> 2] | 0) + 16 >> 3] * +$Ae));
-    }
-    floatheap[(ptrheap[$Sd + 51 >> 2] | 0) + 8 >> 3] = 0.0;
-    floatheap[(ptrheap[$Sd + 51 >> 2] | 0) + 16 >> 3] = 0.0;
+    $Ee = +floatheap[(ptrheap[$Ud + 20 >> 2] | 0) + 8 >> 3];
+    $Fe = +floatheap[(ptrheap[$Ud + 20 >> 2] | 0) + 16 >> 3];
+    floatheap[(ptrheap[$Ud + 20 >> 2] | 0) + 8 >> 3] = +$Be;
+    floatheap[(ptrheap[$Ud + 20 >> 2] | 0) + 16 >> 3] = +$Ce;
+    floatheap[(ptrheap[$Ud + 16 >> 2] | 0) + 8 >> 3] = +(+(+$Be + +(+(+$Be - +$Ee) * 0.9)) + +(+floatheap[(ptrheap[$Ud + 24 >> 2] | 0) + 8 >> 3] * +$Ae));
+    floatheap[(ptrheap[$Ud + 16 >> 2] | 0) + 16 >> 3] = +(+(+$Ce + +(+(+$Ce - +$Fe) * 0.9)) + +(+floatheap[(ptrheap[$Ud + 24 >> 2] | 0) + 16 >> 3] * +$Ae));
+    floatheap[(ptrheap[$Ud + 24 >> 2] | 0) + 8 >> 3] = 0.0;
+    floatheap[(ptrheap[$Ud + 24 >> 2] | 0) + 16 >> 3] = 0.0;
 }
-function $Ud($Vd, $Wd, $Xd) {
-    $Vd = $Vd | 0;
-    $Wd = +$Wd;
-    $Xd = +$Xd;
-    floatheap[(ptrheap[$Vd + 51 >> 2] | 0) + 8 >> 3] = +(+floatheap[(ptrheap[$Vd + 51 >> 2] | 0) + 8 >> 3] + +(+$Wd / +floatheap[$Vd + 11 >> 3]));
-    floatheap[(ptrheap[$Vd + 51 >> 2] | 0) + 16 >> 3] = +(+floatheap[(ptrheap[$Vd + 51 >> 2] | 0) + 16 >> 3] + +(+$Xd / +floatheap[$Vd + 11 >> 3]));
+function $Wd($Xd, $Yd, $Zd) {
+    $Xd = $Xd | 0;
+    $Yd = +$Yd;
+    $Zd = +$Zd;
+    floatheap[(ptrheap[$Xd + 24 >> 2] | 0) + 8 >> 3] = +(+floatheap[(ptrheap[$Xd + 24 >> 2] | 0) + 8 >> 3] + +(+$Yd / +floatheap[$Xd + 8 >> 3]));
+    floatheap[(ptrheap[$Xd + 24 >> 2] | 0) + 16 >> 3] = +(+floatheap[(ptrheap[$Xd + 24 >> 2] | 0) + 16 >> 3] + +(+$Zd / +floatheap[$Xd + 8 >> 3]));
 }
-function $Yd($Zd) {
-    $Zd = $Zd | 0;
+function $0d($1d) {
+    $1d = $1d | 0;
     var $Ge = 0;
     var $He = 0;
     var $Ie = 0.0;
     var $Je = 0.0;
     var $Ke = 0.0;
     var $Le = 0.0;
-    $Ge = ptrheap[$Zd + 32 >> 2] | 0;
-    $He = ptrheap[$Zd + 91 >> 2] | 0;
-    $Ie = +(+floatheap[(ptrheap[$Ge + 19 >> 2] | 0) + 8 >> 3] - +floatheap[(ptrheap[$He + 19 >> 2] | 0) + 8 >> 3]);
-    $Je = +(+floatheap[(ptrheap[$Ge + 19 >> 2] | 0) + 16 >> 3] - +floatheap[(ptrheap[$He + 19 >> 2] | 0) + 16 >> 3]);
+    $Ge = ptrheap[$1d + 32 >> 2] | 0;
+    $He = ptrheap[$1d + 36 >> 2] | 0;
+    $Ie = +(+floatheap[(ptrheap[$Ge + 16 >> 2] | 0) + 8 >> 3] - +floatheap[(ptrheap[$He + 16 >> 2] | 0) + 8 >> 3]);
+    $Je = +(+floatheap[(ptrheap[$Ge + 16 >> 2] | 0) + 16 >> 3] - +floatheap[(ptrheap[$He + 16 >> 2] | 0) + 16 >> 3]);
     $Ke = +$4b(+$Ie, +$Je);
-    if (+$Ke > +floatheap[$Zd + 24 >> 3] | 0) {
-        $0d($Zd | 0);
+    if (+$Ke > +floatheap[$1d + 24 >> 3] | 0) {
+        $fd($1d | 0);
     }
-    $Le = +(+(+floatheap[$Zd + 8 >> 3] / +$Ke) - 1.0);
-    if (!(memheap[$Ge + 8 >> 0] | 0)) {
-        floatheap[(ptrheap[$Ge + 19 >> 2] | 0) + 8 >> 3] = +(+floatheap[(ptrheap[$Ge + 19 >> 2] | 0) + 8 >> 3] + +(+(+$Ie * +$Le) * 0.5));
-        floatheap[(ptrheap[$Ge + 19 >> 2] | 0) + 16 >> 3] = +(+floatheap[(ptrheap[$Ge + 19 >> 2] | 0) + 16 >> 3] + +(+(+$Je * +$Le) * 0.5));
+    $Le = +(+(+floatheap[$1d + 8 >> 3] / +$Ke) - 1.0);
+    if (!(memheap[$Ge + 28 >> 0] | 0)) {
+        floatheap[(ptrheap[$Ge + 16 >> 2] | 0) + 8 >> 3] = +(+floatheap[(ptrheap[$Ge + 16 >> 2] | 0) + 8 >> 3] + +(+(+$Ie * +$Le) * 0.5));
+        floatheap[(ptrheap[$Ge + 16 >> 2] | 0) + 16 >> 3] = +(+floatheap[(ptrheap[$Ge + 16 >> 2] | 0) + 16 >> 3] + +(+(+$Je * +$Le) * 0.5));
     }
-    if (!(memheap[$He + 8 >> 0] | 0)) {
-        floatheap[(ptrheap[$He + 19 >> 2] | 0) + 8 >> 3] = +(+floatheap[(ptrheap[$He + 19 >> 2] | 0) + 8 >> 3] - +(+(+$Ie * +$Le) * 0.5));
-        floatheap[(ptrheap[$He + 19 >> 2] | 0) + 16 >> 3] = +(+floatheap[(ptrheap[$He + 19 >> 2] | 0) + 16 >> 3] - +(+(+$Je * +$Le) * 0.5));
+    if (!(memheap[$He + 28 >> 0] | 0)) {
+        floatheap[(ptrheap[$He + 16 >> 2] | 0) + 8 >> 3] = +(+floatheap[(ptrheap[$He + 16 >> 2] | 0) + 8 >> 3] - +(+(+$Ie * +$Le) * 0.5));
+        floatheap[(ptrheap[$He + 16 >> 2] | 0) + 16 >> 3] = +(+floatheap[(ptrheap[$He + 16 >> 2] | 0) + 16 >> 3] - +(+(+$Je * +$Le) * 0.5));
     }
     gcderef($Ge);
     gcderef($He);
-}
-function $0d($1d) {
-    $1d = $1d | 0;
-    memheap[(ptrheap[$1d + 32 >> 2] | 0) + 10 >> 0] = 1;
-    memheap[(ptrheap[$1d + 91 >> 2] | 0) + 10 >> 0] = 1;
 }
 function $2d($3d) {
     $3d = $3d | 0;
@@ -395,88 +400,89 @@ function $2d($3d) {
     var $Te = 0;
     var $Ue = 0;
     var $Ve = 0.0;
-    $sd = ($3d | 0) + 8 | 0;
-    $td = ($3d | 0) / 2 | 0;
-    $Oe = +(700.0 / +(($sd | 0) - 1 | 0));
-    $Pe = (($Bd | 0) / 2 | 0) - ((imul($sd, ~~$Oe | 0) | 0) / 2 | 0) | 0;
-    for ($Se = 0; ($Se | 0) < ($td | 0) | 0; $Se = ($Se | 0) + 1 | 0) {
-        for ($Re = 0; ($Re | 0) < ($sd | 0) | 0; $Re = ($Re | 0) + 1 | 0) {
+    $vd = ($3d | 0) + 8 | 0;
+    $wd = ($3d | 0) / 2 | 0;
+    $Oe = +(700.0 / +(($vd | 0) - 1 | 0));
+    $Pe = (($Ed | 0) / 2 | 0) - ((imul($vd, ~~$Oe | 0) | 0) / 2 | 0) | 0;
+    for ($Se = 0; ($Se | 0) < ($wd | 0) | 0; $Se = ($Se | 0) + 1 | 0) {
+        for ($Re = 0; ($Re | 0) < ($vd | 0) | 0; $Re = ($Re | 0) + 1 | 0) {
             $Ue = gcref($4c(gcref(calloc(67) | 0) | 0, +(+($Pe | 0) + +(+($Re | 0) * +$Oe)), +(+($Qe | 0) + +(+($Se | 0) * +$Oe)), 1.0, ($Se | 0) == 0 | 0) | 0) | 0;
-            $Te = (imul($Se, $sd) | 0) + ($Re | 0) | 0;
-            ptrheap[$vd + ($Te * 59 | 0) + 16 >> 2] = gcref($Ue | 0) | 0;
-            $Ve = +($Ed | 0);
-            if (($td | 0) > 70 | 0) {
+            $Te = (imul($Se, $vd) | 0) + ($Re | 0) | 0;
+            ptrheap[$yd + ($Te * 4 | 0) + 16 >> 2] = gcref($Ue | 0) | 0;
+            $Ve = +$Hd;
+            if (($wd | 0) > 70 | 0) {
                 $1e = (($Se | 0) % 2 | 0) != 0 | 0;
                 if ($1e) {
                     $1e = (($Re | 0) % 2 | 0) != 0 | 0;
                 }
                 if ($1e) {
-                    memheap[(ptrheap[$vd + ($Te * 59 | 0) + 16 >> 2] | 0) + 9 >> 0] = 1;
+                    memheap[(ptrheap[$yd + ($Te * 4 | 0) + 16 >> 2] | 0) + 29 >> 0] = 1;
                 }
                 if (($Se | 0) < 10 | 0) {
                     $Ve = 80.0;
                 }
             }
             if (($Re | 0) > 0 | 0) {
-                ptrheap[$xd + ($Me * 142 | 0) + 16 >> 2] = gcref($fd(gcref(calloc(150) | 0) | 0, ptrheap[$vd + (($Te | 0) - 1 | 0 * 59 | 0) + 16 >> 2] | 0, ptrheap[$vd + ($Te * 59 | 0) + 16 >> 2] | 0, +$Oe, 1.0, +$Ve) | 0) | 0;
+                ptrheap[$Ad + ($Me * 4 | 0) + 16 >> 2] = gcref($hd(gcref(calloc(150) | 0) | 0, ptrheap[$yd + ((($Te | 0) - 1 | 0) * 4 | 0) + 16 >> 2] | 0, ptrheap[$yd + ($Te * 4 | 0) + 16 >> 2] | 0, +$Oe, 1.0, +$Ve) | 0) | 0;
                 $Me = ($Me | 0) + 1 | 0;
             }
             if (($Se | 0) > 0 | 0) {
-                ptrheap[$xd + ($Me * 142 | 0) + 16 >> 2] = gcref($fd(gcref(calloc(150) | 0) | 0, ptrheap[$vd + ((imul(($Se | 0) - 1 | 0, $sd) | 0) + ($Re | 0) | 0 * 59 | 0) + 16 >> 2] | 0, ptrheap[$vd + ($Te * 59 | 0) + 16 >> 2] | 0, +$Oe, 1.0, +$Ve) | 0) | 0;
+                ptrheap[$Ad + ($Me * 4 | 0) + 16 >> 2] = gcref($hd(gcref(calloc(150) | 0) | 0, ptrheap[$yd + (((imul(($Se | 0) - 1 | 0, $vd) | 0) + ($Re | 0) | 0) * 4 | 0) + 16 >> 2] | 0, ptrheap[$yd + ($Te * 4 | 0) + 16 >> 2] | 0, +$Oe, 1.0, +$Ve) | 0) | 0;
                 $Me = ($Me | 0) + 1 | 0;
             }
         }
     }
-    $wd = $Me | 0;
-    $ud = imul($sd, $td) | 0;
+    $zd = $Me | 0;
+    $xd = imul($vd, $wd) | 0;
     gcderef($Ue);
 }
 function $4d() {
-    return $sd | 0;
+    return $vd | 0;
 }
 function $5d() {
-    return $td | 0;
+    return $wd | 0;
 }
 function $6d($7d) {
     $7d = +$7d;
-    $Fd = +$7d;
+    $Id = +$7d;
 }
 function $8d($9d) {
     $9d = $9d | 0;
-    $Gd = $9d | 0;
+    $Jd = $9d | 0;
 }
 function $_d($ae, $be) {
     $ae = +$ae;
     $be = +$be;
-    floatheap[$yd + 8 >> 3] = +$ae;
-    floatheap[$yd + 16 >> 3] = +$be;
+    floatheap[$Bd + 8 >> 3] = +$ae;
+    floatheap[$Bd + 16 >> 3] = +$be;
 }
 function $ce($de) {
     $de = $de | 0;
-    $Ad = $de | 0;
+    $Dd = $de | 0;
 }
 function $ee() {
-    return $Ad | 0;
+    return $Dd | 0;
 }
 function $fe($ge, $he, $ie) {
     $ge = +$ge;
     $he = +$he;
     $ie = $ie | 0;
-    $zd = gcref($yd | 0) | 0;
-    floatheap[$yd + 8 >> 3] = +$ge;
-    floatheap[$yd + 16 >> 3] = +$he;
+    floatheap[$Cd + 8 >> 3] = +floatheap[$Bd + 8 >> 3];
+    floatheap[$Cd + 16 >> 3] = +floatheap[$Bd + 16 >> 3];
+    floatheap[$Bd + 8 >> 3] = +$ge;
+    floatheap[$Bd + 16 >> 3] = +$he;
 }
 function $je($ke) {
     $ke = $ke | 0;
-    $Bd = $ke | 0;
-    $Id = $K() | 0;
+    $Ed = $ke | 0;
+    $Kd = $K() | 0;
 }
 function $2e() {
-    $vd = gcref(gcref(calloc(500000 + 16 | 0) | 0) | 0) | 0;
-    $xd = gcref(gcref(calloc(500000 + 16 | 0) | 0) | 0) | 0;
-    $yd = gcref($Wc(gcref(calloc(24) | 0) | 0, 0.0, 0.0) | 0) | 0;
-    $zd = gcref($Wc(gcref(calloc(24) | 0) | 0, 0.0, 0.0) | 0) | 0;
-    $Pd = gcref(gcref(calloc(2000000 + 16 | 0) | 0) | 0) | 0;
+    $yd = gcref(gcref(calloc(((500000 | 0) * 4 | 0) + 16 | 0) | 0) | 0) | 0;
+    $Ad = gcref(gcref(calloc(((500000 | 0) * 4 | 0) + 16 | 0) | 0) | 0) | 0;
+    $Bd = gcref($Wc(gcref(calloc(24) | 0) | 0, 0.0, 0.0) | 0) | 0;
+    $Cd = gcref($Wc(gcref(calloc(24) | 0) | 0, 0.0, 0.0) | 0) | 0;
+    $Rd = gcref(gcref(calloc(((2000000 | 0) * 4 | 0) + 16 | 0) | 0) | 0) | 0;
 }
 function $init() {
     $2e();
@@ -485,8 +491,8 @@ return {
     malloc: malloc,
     free: free,
     calloc: calloc,
-    update: $Od,
-    renderLines: $Qd,
+    update: $Qd,
+    renderLines: $Sd,
     constructMesh: $2d,
     getClothW: $4d,
     getClothH: $5d,

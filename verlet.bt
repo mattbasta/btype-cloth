@@ -30,6 +30,7 @@ object Point {
         self.mass = mass;
         self.pinned = pinned;
     }
+
 }
 
 object Link {
@@ -45,6 +46,11 @@ object Link {
         self.distRest = distRest;
         self.stiffness = stiffness;
         self.tearness = tearness;
+    }
+
+    markRemove() {
+        self.p1.markRemove = true;
+        self.p2.markRemove = true;
     }
 }
 
@@ -62,11 +68,10 @@ Vec2d:prevMouse = new Vec2d(0.0, 0.0);
 int:mouseButton = 0;
 int:canvasWidth = 0;
 int:mouseCut = 6;
-int:mouseInfluenceSize = 30;
-int:tearSensitivity = 65;
+float:mouseInfluenceSize = 30.0;
+float:tearSensitivity = 65.0;
 float:gravity = 0.0;
 bool:windEnabled = false;
-int:leftOverTime = 0;
 int:startTime = 0;
 
 
@@ -81,7 +86,7 @@ func float:distPointToLine(float:x, float:y, Vec2d:p1, Vec2d:p2) {
 
     if (lenA > lenB) return 1000.0;
 
-    var det = (-1.0 * Ax * Bx) + (-1.0 * Ay * Ay);
+    var det = (-1.0 * Ax * Bx) + (-1.0 * Ay * By);
 
     if (det > lenB or det < 0.0) {
         var Cx = p2.x - x;
@@ -96,7 +101,6 @@ func float:distPointToLine(float:x, float:y, Vec2d:p1, Vec2d:p2) {
 
 func update() {
     var dt = 16.0 / 1000.0;
-    var totalTime = date.unix() - startTime;
 
     var z = 0;
     var i = 0;
@@ -108,7 +112,12 @@ func update() {
     }
 
     for (i = 0; i < numPoints; i = i + 1;) {
-        if (windEnabled) {
+        updatePoint(points[i], dt);
+    }
+
+    if (windEnabled) {
+        var totalTime = date.unix() - startTime;
+        for (i = 0; i < numPoints; i = i + 1;) {
             applyForce(
                 points[i],
                 ((math.cos(points[i].pos.x / 30.0) + 1.0) * 200.0 +
@@ -116,7 +125,6 @@ func update() {
                 0.0
             );
         }
-        updatePoint(points[i], dt);
     }
 }
 export update;
@@ -149,14 +157,21 @@ export renderLines;
 # Point implementation
 
 func updatePoint(Point:p, float:dt) {
+    if (p.pinned) {
+        return;
+    }
+
     float:dtSeq = dt * dt;
 
+    float:x = p.pos.x;
+    float:y = p.pos.y;
+
     if (mouseButton != 0) {
-        float:dist = math.hypot(p.pos.x - mouse.x, p.pos.y - mouse.y);
+        float:dist = math.hypot(x - mouse.x, y - mouse.y);
         if (mouseButton == 1) {
-            if (dist < (mouseInfluenceSize as float)) {
-                p.lastPos.x = p.pos.x - math.bound((mouse.x - prevMouse.x) * 1.8, -30.0, 30.0);
-                p.lastPos.y = p.pos.y - math.bound((mouse.y - prevMouse.y) * 1.8, -30.0, 30.0);
+            if (dist < mouseInfluenceSize) {
+                p.lastPos.x = x - math.bound((mouse.x - prevMouse.x) * 1.8, -30.0, 30.0);
+                p.lastPos.y = y - math.bound((mouse.y - prevMouse.y) * 1.8, -30.0, 30.0);
             }
         } else if (dist < (mouseCut as float)) {
             p.markRemove = true;
@@ -166,17 +181,13 @@ func updatePoint(Point:p, float:dt) {
     if(!(p.free)) {
         applyForce(p, 0.0, p.mass * gravity);
     }
-
-    float:x = p.pos.x;
-    float:y = p.pos.y;
     float:lx = p.lastPos.x;
     float:ly = p.lastPos.y;
 
-    if(!(p.pinned)) {
-        p.lastPos = p.pos;
-        p.pos.x = x + (x - lx) * 0.9 + p.acc.x * dtSeq;
-        p.pos.y = y + (y - ly) * 0.9 + p.acc.y * dtSeq;
-    }
+    p.lastPos.x = x;
+    p.lastPos.y = y;
+    p.pos.x = x + (x - lx) * 0.9 + p.acc.x * dtSeq;
+    p.pos.y = y + (y - ly) * 0.9 + p.acc.y * dtSeq;
 
     p.acc.x = 0.0;
     p.acc.y = 0.0;
@@ -198,7 +209,7 @@ func solveLink(Link:link) {
     float:d = math.hypot(diffX, diffY);
 
     if (d > link.tearness) {
-        removeLink(link);
+        link.markRemove();
     }
 
     float:scalar = link.distRest / d - 1.0;
@@ -212,11 +223,6 @@ func solveLink(Link:link) {
         p2.pos.x = p2.pos.x - diffX * scalar * 0.5;
         p2.pos.y = p2.pos.y - diffY * scalar * 0.5;
     }
-}
-
-func removeLink(Link:link) {
-    link.p1.markRemove = true;
-    link.p2.markRemove = true;
 }
 
 # Init
@@ -249,7 +255,7 @@ func constructMesh(int:level) {
             index = y * clothW + x;
             points[index] = p;
 
-            tearness = tearSensitivity as float;
+            tearness = tearSensitivity;
 
             if (clothH > 70) {
                 if (y % 2 != 0 and x % 2 != 0) {
@@ -315,7 +321,8 @@ func int:getMouseButton() {
 export getMouseButton;
 
 func mouseMove(float:x, float:y, int:button) {
-    prevMouse = mouse;
+    prevMouse.x = mouse.x;
+    prevMouse.y = mouse.y;
     mouse.x = x;
     mouse.y = y;
 }

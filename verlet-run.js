@@ -36,8 +36,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if(prevMouse) {
             cloth.mouseMove(mouse[0], mouse[1]);
-        }
-        else {
+        } else {
             cloth.setMouse(mouse[0], mouse[1]);
         }
 
@@ -79,7 +78,6 @@ document.addEventListener('DOMContentLoaded', function() {
         e.preventDefault();
 
         var touch = e.changedTouches[0];
-        console.log(touch.pageX, touch.pageY);
         onInteract(touch.pageX, touch.pageY);
     };
 
