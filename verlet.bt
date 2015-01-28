@@ -2,6 +2,16 @@ import date;
 import math;
 
 
+int:mouseButton = 0;
+int:canvasWidth = 0;
+float:mouseCut = 6.0;
+float:mouseInfluenceSize = 30.0;
+float:tearSensitivity = 65.0;
+float:gravity = 0.0;
+bool:windEnabled = false;
+float:startTime = 0.0;
+
+
 #@ TODO: Replace these with a type alias of `tuple<float, float>`
 object Vec2d {
     float:x;
@@ -12,6 +22,11 @@ object Vec2d {
         self.y = y;
     }
 }
+
+
+Vec2d:mouse = new Vec2d(0.0, 0.0);
+Vec2d:prevMouse = new Vec2d(0.0, 0.0);
+
 
 object Point {
     Vec2d:pos;
@@ -31,26 +46,94 @@ object Point {
         self.pinned = pinned;
     }
 
+    update(float:dt) {
+        float:dtSeq = dt * dt;
+
+        float:x = self.pos.x;
+        float:y = self.pos.y;
+
+        if (self.pinned) {
+            return;
+        }
+
+        if (mouseButton != 0) {
+            float:dist = math.hypot(x - mouse.x, y - mouse.y);
+            if (mouseButton == 1) {
+                if (dist < mouseInfluenceSize) {
+                    self.lastPos.x = x - math.bound((mouse.x - prevMouse.x) * 1.8, -30.0, 30.0);
+                    self.lastPos.y = y - math.bound((mouse.y - prevMouse.y) * 1.8, -30.0, 30.0);
+                }
+            } else if (dist < mouseCut) {
+                self.markRemove = true;
+            }
+        }
+
+        if(!(self.free)) {
+            self.applyForce(0.0, self.mass * gravity);
+        }
+        float:lx = self.lastPos.x;
+        float:ly = self.lastPos.y;
+
+        self.lastPos.x = x;
+        self.lastPos.y = y;
+        var velX = (x - lx) * 1.5;
+        var velY = (y - ly) * 1.5;
+        self.pos.x = x + velX + self.acc.x * dtSeq;
+        self.pos.y = y + velY + self.acc.y * dtSeq;
+
+        self.acc.x = 0.0;
+        self.acc.y = 0.0;
+    }
+
+    applyForce(float:x, float:y) {
+        var acc = self.acc;
+        acc.x = acc.x + x / self.mass;
+        acc.y = acc.y + y / self.mass;
+    }
+
 }
 
 object Link {
     Point:p1;
     Point:p2;
     float:distRest;
-    float:stiffness;
     float:tearness;
 
-    new(Point:p1, Point:p2, float:distRest, float:stiffness, float:tearness) {
+    new(Point:p1, Point:p2, float:distRest, float:tearness) {
         self.p1 = p1;
         self.p2 = p2;
         self.distRest = distRest;
-        self.stiffness = stiffness;
         self.tearness = tearness;
     }
 
     markRemove() {
         self.p1.markRemove = true;
         self.p2.markRemove = true;
+    }
+
+    solve() {
+        Point:p1 = self.p1;
+        Point:p2 = self.p2;
+
+        float:diffX = p1.pos.x - p2.pos.x;
+        float:diffY = p1.pos.y - p2.pos.y;
+        float:d = math.hypot(diffX, diffY);
+
+        if (d > self.tearness) {
+            self.markRemove();
+        }
+
+        float:scalar = (self.distRest - d) / d;
+
+        if(!(p1.pinned)) {
+            p1.pos.x = p1.pos.x + diffX * scalar * 0.5;
+            p1.pos.y = p1.pos.y + diffY * scalar * 0.5;
+        }
+
+        if(!(p2.pinned)) {
+            p2.pos.x = p2.pos.x - diffX * scalar * 0.5;
+            p2.pos.y = p2.pos.y - diffY * scalar * 0.5;
+        }
     }
 }
 
@@ -62,42 +145,6 @@ array<Point>:points = new array<Point>(500000);
 int:numLinks = 0;
 array<Link>:links = new array<Link>(500000);
 
-Vec2d:mouse = new Vec2d(0.0, 0.0);
-Vec2d:prevMouse = new Vec2d(0.0, 0.0);
-
-int:mouseButton = 0;
-int:canvasWidth = 0;
-int:mouseCut = 6;
-float:mouseInfluenceSize = 30.0;
-float:tearSensitivity = 65.0;
-float:gravity = 0.0;
-bool:windEnabled = false;
-int:startTime = 0;
-
-
-func float:distPointToLine(float:x, float:y, Vec2d:p1, Vec2d:p2) {
-    var Ax = p1.x - x;
-    var Ay = p1.y - y;
-    var Bx = p2.x - p1.x;
-    var By = p2.y - p1.y;
-
-    var lenA = Ax * Ax + Ay * Ay;
-    var lenB = Bx * Bx + By * By;
-
-    if (lenA > lenB) return 1000.0;
-
-    var det = (-1.0 * Ax * Bx) + (-1.0 * Ay * By);
-
-    if (det > lenB or det < 0.0) {
-        var Cx = p2.x - x;
-        var Cy = p2.y - y;
-        return math.min(lenA, Cx * Cx + Cy * Cy);
-    }
-
-    det = Bx * Ay - By * Ax;
-    return det * det / lenB;
-}
-
 
 func update() {
     var dt = 16.0 / 1000.0;
@@ -107,25 +154,24 @@ func update() {
     for (z = 0; z < 5; z = z + 1;) {
         for (i = 0; i < numLinks; i = i + 1;) {
             if (links[i].p1.markRemove or links[i].p2.markRemove) continue;
-            solveLink(links[i]);
+            links[i].solve();
         }
     }
 
     for (i = 0; i < numPoints; i = i + 1;) {
-        updatePoint(points[i], dt);
+        points[i].update(dt);
     }
 
-    if (windEnabled) {
-        var totalTime = date.unix() - startTime;
-        for (i = 0; i < numPoints; i = i + 1;) {
-            applyForce(
-                points[i],
-                ((math.cos(points[i].pos.x / 30.0) + 1.0) * 200.0 +
-                 points[i].pos.y / 700.0 * 600.0) * (math.sin(totalTime as float) * 0.5 + 1.0),
-                0.0
-            );
-        }
-    }
+    # if (windEnabled) {
+    #     var totalTime = date.sinceinit() - startTime;
+    #     for (i = 0; i < numPoints; i = i + 1;) {
+    #         points[i].applyForce(
+    #             ((math.cos(points[i].pos.x / 30.0) + 1.0) * 200.0 +
+    #              points[i].pos.y / 700.0 * 600.0) * (math.sin(totalTime) * 0.5 + 1.0),
+    #             0.0
+    #         );
+    #     }
+    # }
 }
 export update;
 
@@ -154,77 +200,6 @@ func array<sfloat>:renderLines() {
 export renderLines;
 
 
-# Point implementation
-
-func updatePoint(Point:p, float:dt) {
-    if (p.pinned) {
-        return;
-    }
-
-    float:dtSeq = dt * dt;
-
-    float:x = p.pos.x;
-    float:y = p.pos.y;
-
-    if (mouseButton != 0) {
-        float:dist = math.hypot(x - mouse.x, y - mouse.y);
-        if (mouseButton == 1) {
-            if (dist < mouseInfluenceSize) {
-                p.lastPos.x = x - math.bound((mouse.x - prevMouse.x) * 1.8, -30.0, 30.0);
-                p.lastPos.y = y - math.bound((mouse.y - prevMouse.y) * 1.8, -30.0, 30.0);
-            }
-        } else if (dist < (mouseCut as float)) {
-            p.markRemove = true;
-        }
-    }
-
-    if(!(p.free)) {
-        applyForce(p, 0.0, p.mass * gravity);
-    }
-    float:lx = p.lastPos.x;
-    float:ly = p.lastPos.y;
-
-    p.lastPos.x = x;
-    p.lastPos.y = y;
-    p.pos.x = x + (x - lx) * 0.9 + p.acc.x * dtSeq;
-    p.pos.y = y + (y - ly) * 0.9 + p.acc.y * dtSeq;
-
-    p.acc.x = 0.0;
-    p.acc.y = 0.0;
-}
-
-func applyForce(Point:p, float:x, float:y) {
-    p.acc.x = p.acc.x + x / p.mass;
-    p.acc.y = p.acc.y + y / p.mass;
-}
-
-# Link implementation
-
-func solveLink(Link:link) {
-    Point:p1 = link.p1;
-    Point:p2 = link.p2;
-
-    float:diffX = p1.pos.x - p2.pos.x;
-    float:diffY = p1.pos.y - p2.pos.y;
-    float:d = math.hypot(diffX, diffY);
-
-    if (d > link.tearness) {
-        link.markRemove();
-    }
-
-    float:scalar = link.distRest / d - 1.0;
-
-    if(!(p1.pinned)) {
-        p1.pos.x = p1.pos.x + diffX * scalar * 0.5;
-        p1.pos.y = p1.pos.y + diffY * scalar * 0.5;
-    }
-
-    if(!(p2.pinned)) {
-        p2.pos.x = p2.pos.x - diffX * scalar * 0.5;
-        p2.pos.y = p2.pos.y - diffY * scalar * 0.5;
-    }
-}
-
 # Init
 
 func constructMesh(int:level) {
@@ -236,7 +211,7 @@ func constructMesh(int:level) {
 
     float:restingDistance = 700.0 / ((clothW - 1) as float);
 
-    int:startX = canvasWidth / 2 - ((clothW * (restingDistance as int)) / 2);
+    int:startX = canvasWidth / 2 - (clothW * (restingDistance as int)) / 2;
     int:startY = 0;
 
     int:x = 0;
@@ -268,12 +243,12 @@ func constructMesh(int:level) {
             }
 
             if (x > 0) {
-                links[linkPtr] = new Link(points[index - 1], points[index], restingDistance, 1.0, tearness);
+                links[linkPtr] = new Link(points[index - 1], points[index], restingDistance, tearness);
                 linkPtr = linkPtr + 1;
             }
 
             if (y > 0) {
-                links[linkPtr] = new Link(points[(y - 1) * clothW + x], points[index], restingDistance, 1.0, tearness);
+                links[linkPtr] = new Link(points[(y - 1) * clothW + x], points[index], restingDistance, tearness);
                 linkPtr = linkPtr + 1;
             }
         }
@@ -330,6 +305,6 @@ export mouseMove;
 
 func main(int:width) {
     canvasWidth = width;
-    startTime = date.unix();
+    startTime = date.sinceinit();
 }
 export main;

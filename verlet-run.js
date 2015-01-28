@@ -1,13 +1,4 @@
-
 var canvas, ctx;
-var requestAnimFrame = (function(){
-    return (window.requestAnimationFrame ||
-            window.webkitRequestAnimationFrame ||
-            window.mozRequestAnimationFrame ||
-            function(callback) {
-                setTimeout(callback, 1000 / 60);
-            });
-})();
 
 document.addEventListener('DOMContentLoaded', function() {
     canvas = document.createElement('canvas');
@@ -105,7 +96,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function start() {
         lastTime = Date.now();
         running = true;
-        requestAnimFrame(heartbeat);
+        requestAnimationFrame(heartbeat);
     }
 
     function stop() {
@@ -119,7 +110,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        requestAnimFrame(heartbeat);
+        requestAnimationFrame(heartbeat);
 
         stats.begin();
         var now = Date.now();
