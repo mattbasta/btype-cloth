@@ -1,4 +1,5 @@
 import date;
+import debug;
 import math;
 
 
@@ -76,8 +77,8 @@ object Point {
 
         self.lastPos.x = x;
         self.lastPos.y = y;
-        var velX = (x - lx) * 1.5;
-        var velY = (y - ly) * 1.5;
+        var velX = (x - lx) * 0.9;
+        var velY = (y - ly) * 0.9;
         self.pos.x = x + velX + self.acc.x * dtSeq;
         self.pos.y = y + velY + self.acc.y * dtSeq;
 

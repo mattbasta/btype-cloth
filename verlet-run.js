@@ -120,6 +120,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // update
 
         cloth.update();
+        cloth.update();
 
         // render
 
