@@ -53,23 +53,23 @@ object Point {
         float:x = self.pos.x;
         float:y = self.pos.y;
 
-        if (self.pinned) {
+        if self.pinned {
             return;
         }
 
-        if (mouseButton != 0) {
+        if mouseButton != 0 {
             float:dist = math.hypot(x - mouse.x, y - mouse.y);
-            if (mouseButton == 1) {
-                if (dist < mouseInfluenceSize) {
+            if mouseButton == 1 {
+                if dist < mouseInfluenceSize {
                     self.lastPos.x = x - math.bound((mouse.x - prevMouse.x) * 1.8, -30.0, 30.0);
                     self.lastPos.y = y - math.bound((mouse.y - prevMouse.y) * 1.8, -30.0, 30.0);
                 }
-            } else if (dist < mouseCut) {
+            } else if dist < mouseCut {
                 self.markRemove = true;
             }
         }
 
-        if(!(self.free)) {
+        if !(self.free) {
             self.applyForce(0.0, self.mass * gravity);
         }
         float:lx = self.lastPos.x;
@@ -120,18 +120,18 @@ object Link {
         float:diffY = p1.pos.y - p2.pos.y;
         float:d = math.hypot(diffX, diffY);
 
-        if (d > self.tearness) {
+        if d > self.tearness {
             self.markRemove();
         }
 
         float:scalar = (self.distRest - d) / d;
 
-        if(!(p1.pinned)) {
+        if !(p1.pinned) {
             p1.pos.x = p1.pos.x + diffX * scalar * 0.5;
             p1.pos.y = p1.pos.y + diffY * scalar * 0.5;
         }
 
-        if(!(p2.pinned)) {
+        if !(p2.pinned) {
             p2.pos.x = p2.pos.x - diffX * scalar * 0.5;
             p2.pos.y = p2.pos.y - diffY * scalar * 0.5;
         }
@@ -152,27 +152,17 @@ func update() {
 
     var z = 0;
     var i = 0;
-    for (z = 0; z < 5; z = z + 1;) {
-        for (i = 0; i < numLinks; i = i + 1;) {
+    for z = 0; z < 5; z = z + 1; {
+        for i = 0; i < numLinks; i = i + 1; {
             if (links[i].p1.markRemove or links[i].p2.markRemove) continue;
             links[i].solve();
         }
     }
 
-    for (i = 0; i < numPoints; i = i + 1;) {
+    for i = 0; i < numPoints; i = i + 1; {
         points[i].update(dt);
     }
 
-    # if (windEnabled) {
-    #     var totalTime = date.sinceinit() - startTime;
-    #     for (i = 0; i < numPoints; i = i + 1;) {
-    #         points[i].applyForce(
-    #             ((math.cos(points[i].pos.x / 30.0) + 1.0) * 200.0 +
-    #              points[i].pos.y / 700.0 * 600.0) * (math.sin(totalTime) * 0.5 + 1.0),
-    #             0.0
-    #         );
-    #     }
-    # }
 }
 export update;
 
@@ -182,7 +172,7 @@ func array<sfloat>:renderLines() {
     int:idx = 1;
 
     var i = 0;
-    for (i = 0; i < numLinks; i = i + 1;) {
+    for i = 0; i < numLinks; i = i + 1; {
         if (links[i].p1.markRemove or links[i].p2.markRemove) continue;
 
         verts[idx] = links[i].p1.pos.x as sfloat;
@@ -220,8 +210,8 @@ func constructMesh(int:level) {
     int:index = 0;
     Point:p = null;
     float:tearness = 0.0;
-    for(y = 0; y < clothH; y = y + 1;) {
-        for(x = 0; x < clothW; x = x + 1;) {
+    for y = 0; y < clothH; y = y + 1; {
+        for x = 0; x < clothW; x = x + 1; {
             p = new Point(
                 (startX as float) + (x as float) * restingDistance,
                 (startY as float) + (y as float) * restingDistance,
@@ -233,22 +223,22 @@ func constructMesh(int:level) {
 
             tearness = tearSensitivity;
 
-            if (clothH > 70) {
-                if (y % 2 != 0 and x % 2 != 0) {
+            if clothH > 70 {
+                if y % 2 != 0 and x % 2 != 0 {
                     points[index].free = true;
                 }
 
-                if (y < 10) {
+                if y < 10 {
                     tearness = 80.0;
                 }
             }
 
-            if (x > 0) {
+            if x > 0 {
                 links[linkPtr] = new Link(points[index - 1], points[index], restingDistance, tearness);
                 linkPtr = linkPtr + 1;
             }
 
-            if (y > 0) {
+            if y > 0 {
                 links[linkPtr] = new Link(points[(y - 1) * clothW + x], points[index], restingDistance, tearness);
                 linkPtr = linkPtr + 1;
             }
